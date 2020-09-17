@@ -74,13 +74,27 @@ main(int argc, char *argv[])
               server->h_length);
         serv_addr.sin_port = htons(portno);
 
-        /* DESCRIPTOR - DIRECCION - TAMAÑO DIRECCION */
-        if (connect(sockfd, (const struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
+        /* DESCRIPTOR - DIRECCION - TAMAÑO DIRECCION */       
+        if (connect(sockfd,(const struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0) 
                 error("ERROR connecting");
+       //Seteamos el buffer completo con el caracter e 
+       
+       //https://www.ibm.com/support/knowledgecenter/SSLTBW_2.3.0/com.ibm.zos.v2r3.bpxbd00/memset.htm
+        memset((buffer ), 'e', BUFFER_SIZE );
 
-        *buffer = 'y';
-        memset((buffer + 1), 'e', BUFFER_SIZE - 2);
+        // Se comentan las proximas lineas que pedian el ingreso de caracteres par enviarlo al server
+       // printf("Please enter the message: ");
+       // bzero(buffer,BUFFER_SIZE);
+       // fgets(buffer,BUFFER_SIZE,stdin);
+        //ENVIA UN MENSAJE AL SOCKET
+         //       n = write(sockfd,buffer,strlen(buffer));
+       // if (n < 0) 
+                // error("ERROR writing to socket");
+       // bzero(buffer,BUFFER_SIZE);
 
+
+
+	
         /* ENVIA UN MENSAJE AL SOCKET */
         n = write(sockfd, buffer, strlen(buffer));
         if (n < 0)

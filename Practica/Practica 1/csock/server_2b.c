@@ -10,7 +10,6 @@
 #include <netinet/in.h>
 
 
-void set_verbose_mode(int argc, char *argv[], int *verbose_flag_ptr);
 
 /*
  * En tiempo de compilación se puede definir esta macro con un valor numérico >= 0
@@ -70,13 +69,15 @@ main(int argc, char *argv[])
         serv_addr.sin_addr.s_addr = INADDR_ANY;
         serv_addr.sin_port = htons(portno);
 
-        set_verbose_mode(argc, argv, &verbose_flag);
+     /*   set_verbose_mode(argc, argv, &verbose_flag);
 
         /* Instead of reporting ‘--verbose’
         and ‘--brief’ as they are encountered,
-        we report the final status resulting from them. */
+        we report the final status resulting from them. 
         if (verbose_flag)
-                puts("verbose flag is set");
+                puts("verbose flag is set"); 
+                
+                */
 
         /* VINCULA EL FILE DESCRIPTOR CON LA DIRECCION Y EL PUERTO */
         if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
@@ -104,9 +105,9 @@ main(int argc, char *argv[])
         
         printf("Receibed message with %d characters\n", n);
 
-        if (verbose_flag) {
+        /* if (verbose_flag) {
                 printf("Message content:\n%s\n", buffer);
-        }
+        } */
 
 
         /* RESPONDE AL CLIENTE */
@@ -117,54 +118,3 @@ main(int argc, char *argv[])
 }
 
 
-void
-set_verbose_mode(int argc, char *argv[], int *verbose_flag_ptr)
-{
-        static int verbose_flag;
-        int c;
-
-        while (1)
-        {
-                static struct option long_options[] =
-                {
-                        {"verbose", no_argument, &verbose_flag, 1},
-                        {"brief", no_argument, &verbose_flag, 0},
-                        {0, 0, 0, 0}
-                };
-                /* getopt_long stores the option index here. */
-                int option_index = 0;
-
-                c = getopt_long(argc, argv, "vb",
-                                long_options, &option_index);
-
-                /* Detect the end of the options. */
-                if (c == -1)
-                        break;
-
-                switch (c)
-                {
-                case 0:
-                        /* If this option set a flag, do nothing else now. */
-                        if (long_options[option_index].flag != 0)
-                                break;
-                        printf("option %s", long_options[option_index].name);
-                        if (optarg)
-                                printf(" with arg %s", optarg);
-                        printf("\n");
-                        break;
-                case 'v':
-                        verbose_flag = 1;
-                        break;
-                case 'b':
-                        verbose_flag = 0;
-                        break;
-                case '?':
-                        /* getopt_long already printed an error message. */
-                        break;
-                default:
-                        exit(0);
-                }
-        }
-
-        *verbose_flag_ptr = verbose_flag;
-}
