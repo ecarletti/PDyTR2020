@@ -30,7 +30,7 @@
 *Sugerencia: puede modificar los programas (C o Java o ambos) para que la cantidad de datos que se comunican sea de 10<sup>3</sup>,  10<sup>4</sup>,  10<sup>5</sup> y  10<sup>6</sup> bytes  y  contengan  bytes  asignados  directamente  en  el  programa (pueden  no  leer  de  teclado  ni  mostrar  en  pantalla  cada  uno  de  los  datos  del  buffer), explicando  el  resultado  en  cada  caso. Importante: notar  el  uso de  “attempts”  en “...attempts to read up to count bytes from file descriptor fd...” así como el valor de retorno de la función read (del man read).*
 
   - Modificamos el código del cliente y servidor (del lenguaje C), en donde el buffer puede ser definido en tiempo de compilación (con las directivas #ifdef, #else y #endif). 
-      `Se encuentran en csocks los archivos client_2b.c y server_2b.c`
+      
       
   - El tamaño del buffer tanto del cliente como del servidor se fueron ejecutando con los diferentes valores mencionados en el punto, para ver hasta que cantidad de datos se pueden leer.
     El servidor pudo leer correctamente todos los caracteres enviados para un *BUFFER_SIZE* menor o igual a 10<sup>4</sup>.
@@ -39,6 +39,7 @@
     ![Máximo recibido buffer](images/2b.png)
     
     
+> **Nota:** Se encuentran en csocks los archivos **client_2b.c** y **server_2b.c**
 
 
 >- **c.-** Agregue a la modificación anterior una verificación de llegada correcta de los datos que se envían(cantidad y contenido del buffer), de forma tal que se asegure que todos los datos enviados llegan    correctamente, independientemente de la cantidad  de datos involucrados.
@@ -50,7 +51,7 @@ Por otra parte, el *servidor* espera los datos, el hash y el tamaño de los dato
 
 ![Checksum recibido.](images/check.png).
 
-**Los archivos que realizan el punto C son: client_2c.c y server_2c.c**
+> **Nota:** Los archivos que realizan el punto C son: **client_2c.c** y **server_2c.c**
 
 
 
@@ -58,7 +59,7 @@ Por otra parte, el *servidor* espera los datos, el hash y el tamaño de los dato
 
 Utilizamos la la función dwalltime para medir el tiempo existente entre el comienzo de la transmisión de datos y la confirmación del servidor de los mismos fueron recibidos.
 
-Los ejercicios estan plasmados en client_2d.c y server_2d.c <sub>(aunque no se modifico de server_2c.c)</sup>
+
 
 *Comunicación 10<sup>3</sup>*
 
@@ -129,6 +130,7 @@ Desviación estándar (σ): 0.000022s**
 Desviación estándar (σ): 0.000141s**
 
 
+>**Nota**: Los ejercicios están plasmados en **client_2d.c** y **server_2d.c** <sub>(aunque no sufrió modificaciones de server_2c.c)</sup>
 
 >**3.** ¿Por qué en  C  se  puede  usar  la  misma  variable  tanto  para  leer  de  teclado  como  para enviar por un socket? ¿Esto sería relevante para las aplicaciones c/s?
 
