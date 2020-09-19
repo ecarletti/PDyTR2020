@@ -10,10 +10,8 @@
   - En Java se utiliza **java.net** para la creación de los sockets y otros módulos provenientes de la librería **java.io** para la comunicación de los mismos a modo de *read & write*, le da un uso a los sockets en un paradigma de alto nivel.
   
 * **Implemetacion:**
-    - En enfoque a Java, cuenta con una clase **java.net.Socket** ,la cual permite una comunicación bidireccional entre dos procesos en una red (la cual son definidos por el programa). También cuenta con la clase **java.net.ServerSocket** para la implementación de sockets que estén *listen* y aceptando conexiones de procesos clientes.
-    >
-    - En cambio C, no existe una distinción marcada entre el Cliente/Servidor. Si no que el modelo puede ser implementado pero la librería que se utiliza no cuenta con funciones directamente relacionadas con esta tarea. La librería **sys/socket.h** contiene la función socket, que se carga de crear un socket.  En C, son representados por file descriptors, de los cuales se conoce un numero único (de identificación), los cuales se utilizan de la misma manera que archivos en un file system (*leyendolos y escribiendolos*). Ademas se utilizan operaciones tales como: *bind*, *listen* y *accept* sobre el socket servidor para darle una dirección, permitirle escuchar conexiones o aceptarlas respectivamente.
-  >
+  - En enfoque a Java, cuenta con una clase **java.net.Socket** ,la cual permite una comunicación bidireccional entre dos procesos en una red (la cual son definidos por el programa). También cuenta con la clase **java.net.ServerSocket** para la implementación de sockets que estén *listen* y aceptando conexiones de procesos clientes.
+  - En cambio C, no existe una distinción marcada entre el Cliente/Servidor. Si no que el modelo puede ser implementado pero la librería que se utiliza no cuenta con funciones directamente relacionadas con esta tarea. La librería **sys/socket.h** contiene la función socket, que se carga de crear un socket.  En C, son representados por file descriptors, de los cuales se conoce un numero único (de identificación), los cuales se utilizan de la misma manera que archivos en un file system (*leyéndolos y escribiéndolos*). Ademas se utilizan operaciones tales como: *bind*, *listen* y *accept* sobre el socket servidor para darle una dirección, permitirle escuchar conexiones o aceptarlas respectivamente.
 * **Similitudes:**
   - Tanto Java como C tienen el mismo fin, poseen características y funciones suficientes para cumplir el modelo de Cliente / Servidor, poder lograr una comunicación a través de los sockets, pueden intercambiar cualquier flujo de datos ya seas procesos en la misma PC o distinta(se permite elegir el protocolo (TCP/UDP). 
   La lectura funciona de la misma manera. Apenas llega algún dato al receptor, se libera (el buffer/stream) para continuar con la ejecución.
@@ -30,8 +28,7 @@
 *Sugerencia: puede modificar los programas (C o Java o ambos) para que la cantidad de datos que se comunican sea de 10<sup>3</sup>,  10<sup>4</sup>,  10<sup>5</sup> y  10<sup>6</sup> bytes  y  contengan  bytes  asignados  directamente  en  el  programa (pueden  no  leer  de  teclado  ni  mostrar  en  pantalla  cada  uno  de  los  datos  del  buffer), explicando  el  resultado  en  cada  caso. Importante: notar  el  uso de  “attempts”  en “...attempts to read up to count bytes from file descriptor fd...” así como el valor de retorno de la función read (del man read).*
 
   - Modificamos el código del cliente y servidor (del lenguaje C), en donde el buffer puede ser definido en tiempo de compilación (con las directivas #ifdef, #else y #endif). 
-      
-      
+    
   - El tamaño del buffer tanto del cliente como del servidor se fueron ejecutando con los diferentes valores mencionados en el punto, para ver hasta que cantidad de datos se pueden leer.
     El servidor pudo leer correctamente todos los caracteres enviados para un *BUFFER_SIZE* menor o igual a 10<sup>4</sup>.
     **Cuando el tamaño es mayor solo se pueden leer ≈ 65482** *como podemos observar en la siguiente imagen.*
@@ -42,7 +39,7 @@
 > **Nota:** Se encuentran en csocks los archivos **client_2b.c** y **server_2b.c**
 
 
->- **c.-** Agregue a la modificación anterior una verificación de llegada correcta de los datos que se envían(cantidad y contenido del buffer), de forma tal que se asegure que todos los datos enviados llegan    correctamente, independientemente de la cantidad  de datos involucrados.
+>- **c.-** Agregue a la modificación anterior una verificación de llegada correcta de los datos que se envían(cantidad y contenido del buffer), de forma tal que se asegure que todos los datos enviados llegan correctamente, independientemente de la cantidad  de datos involucrados.
 
 Agregamos una función de hash en el cliente y servidor, `unsigned long djb2(unsigned char *str); ` la  cual genera un hash de los datos recibidos para después utilizarlo al realizar un checksum.
 
@@ -55,13 +52,11 @@ Por otra parte, el *servidor* espera los datos, el hash y el tamaño de los dato
 
 
 
->- **d.-** Grafique el promedio y la desviación estándar de los tiempos de comunicaciones de cada comunicación.    Explique    el    experimento    realizado    para    calcular    el    tiempo    de comunicaciones.
+>- **d.-** Grafique el promedio y la desviación estándar de los tiempos de comunicaciones de cada comunicación. Explique el experimento realizado para calcular el tiempo de comunicaciones.
 
-Utilizamos la la función dwalltime para medir el tiempo existente entre el comienzo de la transmisión de datos y la confirmación del servidor de los mismos fueron recibidos.
+Utilizamos la la función **dwalltime** para medir el tiempo existente entre el comienzo de la transmisión de datos y la confirmación del servidor de los mismos fueron recibidos.
 
-
-
-*Comunicación 10<sup>3</sup>*
+<u>*Comunicación 10*</u><sup>3</sup>
 
 - Tiempo en segundos: 
 
@@ -73,13 +68,11 @@ Utilizamos la la función dwalltime para medir el tiempo existente entre el comi
 
 Media : 0.000112s
 
-Quitamos los 0 para que el calculo sea mas prolijo y con media  $\mu = 112$ .
-
-
+Quitamos los 0 (ceros) para que el calculo sea mas sencillo y con media μ = ~~0.000~~112s -> 112s.
 
 Calculamos la distancia de cada dato a la media (es decir, las desviaciones) y elevamos cada una de esas distancias al cuadrado.
 $$
-\sqrt {\left( \dfrac{   \sum  | X - \mu|^2}{N} \right)} = \dfrac{1509 + 16 + 178 +  81 + 1089 +36 + 121 + 40 + 64}{10} ≈ 313
+\sqrt {\left( \dfrac{   \sum  | X - \mu|^2}{N} \right)} = \dfrac{1089 + 16 + 178 +  81 + 1509 +36 + 121 + 40 + 64}{10} ≈ 313
 $$
 
 $$
@@ -93,7 +86,7 @@ $$
 **Promedio -- Media aritmética(μ): 0.000112s**
 **Desviación estándar (σ) 0.000018s **
 
-*Comunicación 10<sup>4</sup>*
+<u>*Comunicación 10*</u><sup>4</sup>
 
 - Tiempo en segundos: 
   0.000201s - 0.000132s
@@ -105,7 +98,7 @@ $$
 **Promedio - Media aritmética(μ): 0.000186s
 Desviación estándar (σ): 0.000030s**
 
-*Comunicación 10<sup>5</sup>*
+*<u>Comunicación 10</u><sup>5</sup>*
 
 - Tiempo en segundos: 
   0.000337s - 0.000301s
@@ -117,7 +110,7 @@ Desviación estándar (σ): 0.000030s**
 **Promedio - Media aritmética(μ): 0.000314s
 Desviación estándar (σ): 0.000022s**
 
-*Comunicación 10<sup>6</sup>*
+<u>*Comunicación 10*</u><sup>6</sup>
 
 - Tiempo en segundos: 
   0.002966s - 0.002730s
@@ -136,20 +129,31 @@ Desviación estándar (σ): 0.000141s**
 
 
 
+<u>Función write en C:</u>
+
+![Write en C](images/write.png)
+
+En el caso de la variable utilizada para leer de teclado,la misma se define como : `char buffer[256]`;
+Por lo tanto, buffer es una variable de tipo puntero,la cual referencia un espacio de memoria de caracteres alocado en forma estática.
+Es por esto que, dado que *write espera un argumento de tipo puntero como lo es la variable `buffer`*, puedo utilizar  la  misma  variable  **tanto para  entrada de texto del teclado como para el envio del mismo por un socket**.
+Es decir, al momento de manejar memoria y punteros tiene ciertas desventajas al momento de programar una arquitectura del modelo cliente-servidor.  Ya que se deben usar con precauciones dado que, siendo siempre un espacio de bytes, dependerá de como el cliente interprete los datos en el espacio de memoria recibido al momento de acceder a la información.
+
+
+
 >**4.** ¿Podría implementar  un  servidor  de  archivos  remotos  utilizando  sockets?  Describa brevemente la interfaz y los detalles que considere más importantes del diseño. No es necesario implementar.
 
 
 
 
 
->5.** Defina qué es  un  servidor  con  estado  (stateful  server)  y qué es  un  servidor  sin  estado (stateless server).
+>**5.** Defina qué es  un  servidor  con  estado  (stateful  server)  y qué es  un  servidor  sin  estado (stateless server).
 
-- Stateful Server  
+- <u>Stateful Server</u>  
 
 Un  servidor  con  estado  es  aquel  que  mantiene  el estado de la información del usuario en forma de sesiones. Este tipo de servidores recuerda los datos del cliente (estado) de una solicitud a la siguiente. Servidores con estado, almacenar estado de sesión. 
 Por  lo  tanto,  pueden  realizar  un  seguimiento  de que  clientes  han  abierto  que  archivos,  punteros de lectura y escritura actuales para archivos, que archivos han sido bloqueados por que clientes, etc. 
 
-- Stateless Server
+- <u>Stateless Server</u>
 
 A diferencia de un servidor con estado, el servidor sin estado es aquel que no mantiene ningún estado de la información para el usuario.  En este tipo de servidores, cada consulta es completamente independiente a la anterior. Sin embargo, los servidores sin estado pueden identificar al usuario si la solicitud al servicio incluye una identificación de usuario única que se asigno anteriormente al mismo. 
 Ese identificador (ID) del usuario deberá pasarse en cada consulta,  a diferencia  del  caso  de  los  servidores  con  estado  que mantienen  este  ID  de  usuario  en  la  sesión  y  los datos de la solicitud no necesariamente deben contener este ID.
