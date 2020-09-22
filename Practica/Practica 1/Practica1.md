@@ -142,62 +142,66 @@ Es decir, al momento de manejar memoria y punteros tiene ciertas desventajas al 
 
 >**4.** ¿Podría implementar  un  servidor  de  archivos  remotos  utilizando  sockets?  Describa brevemente la interfaz y los detalles que considere más importantes del diseño. No es necesario implementar.
 
-Para plantear una implementacion de servidor de archivos remotos utilizando sockets debe asegurarse la utilizacion de una serie de operaciones necesarias para el manejo del filesystem. Como asi tambien la utilizacion de un protocolo de red para la transferencia de informacion. Para este caso usaremos el protocolo existente FTP.
+Para plantear una implementación de servidor de archivos remotos utilizando sockets se deben utilizar de una serie de operaciones necesarias para el manejo del filesystem. Como así también la utilización de un protocolo de red para la comunicación y transferencia de información. Para este caso usaremos el protocolo existente FTP(TCP).
 
 - FTP:
 
-  Puede realizarse una implementeacion de FTP utilizando dos sockets de tipo TCP para el servidor. Estos sockets deben escuchar en los puertos estandar 20(datos) y 21(control)
+Puede realizarse una implementación de FTP utilizando dos sockets de tipo TCP para el servidor. Estos sockets deben escuchar en los puertos estándar 20(datos) y 21(control)
 
 Operaciones necesarias para el manejo del filesystem del servidor:
 
-- cd `path/to/directory`
+- cd `directorio`
 
-  Se utiliza para cambiar el directorio actual de trabajo del servidor remoto. Recibe como parametro una ruta relativa o absuluta del filesystem. En el caso de que no se reciba parametro el cambio se realiza al directorio principal.
-- cp `source/path destination/path`
+Se utiliza para cambiar el directorio actual de trabajo del servidor remoto. Recibe como parámetro una ruta relativa o absoluta del filesystem. En el caso de que no se reciba parámetro el cambio se realiza al directorio principal.
 
-  Se utiliza para copiar un archivo o directorio desde una direccion origen a una direccion destino del servidor remoto. Ambas direcciones pueden ser relativas al directorio actual o absoluta.
-- delete `path/to/file_or_directory`
+Cuando el cliente envia el comando `cd directorio`, el servidor debe cambiar el directorio de trabajo actual.
+- cp `direcctorio_origen directorio_destino`
 
-  Elimina un archivo o directorio del filesystem en el servidor remoto. 
+Se utiliza para copiar un archivo o directorio desde origen a destino del servidor remoto. Ambas ubicación pueden ser relativas al directorio actual o absoluta.
 
-  El cliente envia el comando `delete` seguido de un nombre de archivo o directorio a eliminar. El servidor comprueba la existencia del archivo o directorio y lo elimina.
-- find `filename`
+El cliente envía el comando `cd origin destino` y el servidor debe realizar la copia del archivo o directorio al destino.
 
-  Realiza la busqueda de un archivo por el nombre del paramtro en el filesystem del servidor remoto. 
+- delete `ubicacion_de_archivo_o_directorio`
 
-  El cliente envia el comando `find` seguido del nombre a buscar. El servidor retornara una lista con el path de archivos que coincida el nombre o bien no retornara nada en caso de que ningun archivo en el filesystem coincida con el nombre.
-- get `path/to/file`
+Elimina un archivo o directorio del filesystem en el servidor remoto.
 
-  Retornara el archivo que se encuentra en el path que se paso como parametro. 
+El cliente envía el comando `delete` seguido de un nombre de archivo o directorio a eliminar. El servidor comprueba la existencia del archivo o directorio y lo elimina.
+- find `nombre_de_archivo`
 
-  El cliente envia el el comando `get` seguido de la direccion absoluta o relativa del archivo. Como resultado de la operacion el servidor remoto verifica que el archivo exista y tranfiere el archivo a la maquina local en el directorio actual.
+Realiza la búsqueda de un archivo por el nombre del parámetro en el filesystem del servidor remoto.
+
+El cliente envía el comando `find` seguido del nombre a buscar. El servidor retornara una lista que contiene la ubicación de los archivos que coincida el nombre o bien no retornara nada en caso de que ningún archivo en el filesystem coincida con el nombre.
+- get `ubicacion_del_archivo`
+
+Retornará el archivo que se encuentra en la ubicación que se pasó como parámetro.
+
+El cliente envia el el comando `get` seguido de la dirección absoluta o relativa del archivo. Como resultado de la operación el servidor remoto verifica que el archivo exista y transfiere el archivo a la máquina local en el directorio actual.
 - ls
 
-  Crea una lista con todos los archivos que se encuntran en el directorio actual.
+Crea una lista con todos los archivos que se encuentran en el directorio actual.
 
-  El cliente envia el comando `ls` y el servidor remoto responde con la lista de archivos del directorio actual junto con el tamaño de cada archivo. 
-- mkdir `folder_name`
+El cliente envía el comando `ls` y el servidor remoto responde con la lista de archivos del directorio actual junto con el tamaño de cada archivo.
+- mkdir `nombre_de_carpeta`
 
-  Crea un nuevo directorio con nombre `folder_name` en la direccion actual en el filesystem.
+Crea un nuevo directorio con nombre `nombre_de_carpeta` en la dirección actual en el filesystem.
 
-  El cliente envia el comando `mkdir folder_name`, el servidor debe verificar que no exista un directorio con el mismo nombre es esa ruta. Si no existe el servidor crea el directorio.
-- mv `source/path destination/path`
+El cliente envía el comando `mkdir nombre_de_carpeta`, el servidor debe verificar que no exista un directorio con el mismo nombre es esa ubicación. Si no existe el servidor crea el directorio.
+- mv `origen destino`
 
-  Mueve un archivo o directorio desde una direccion origen a una direccion destino del servidor remoto. Ambas direcciones pueden ser relativas al directorio actual o absoluta.
-- put `file_name`
+Mueve un archivo o directorio desde origen a destino del servidor remoto. Ambas direcciones pueden ser relativas al directorio actual o absoluta.
+- put `nombre_del_archivo`
 
-  Envia el archivo file_name de la maquina local al servidor remoto.
+Envía el archivo nombre_del_archivo de la máquina local al servidor remoto.
 
-  El cliente envia el comando `put file_name`, y el servidor debe recibir el archivo y almacenarlo en el directorio actual de trabajo. 
+El cliente envía el comando `put nombre_del_archivo`, y el servidor debe recibir el archivo y almacenarlo en el directorio actual de trabajo.
 
 - pwd
 
-  Muestra el path absoluto del directorio actual.
+Muestra el path absoluto del directorio actual.
 
-  El cliente envia el comando `pwd` y el servidor remoto responde con la direccion absoluta del directorio actual de trabajo.
+El cliente envía el comando `pwd` y el servidor remoto responde con la dirección absoluta del directorio actual de trabajo.
 
-
-Para los comandos `cp, delete, mkdir, mv, put` el cliente debe tener permisos de escritura en el directorio correspondiente del servidor remoto.
+Para los comandos `cp, delete, mkdir, mv, put` el cliente debe tener permisos de escritura en el directorio correspondiente del servidor remoto, para los demas solo basta con tener permisos de lectura.
 
 
 >**5.** Defina qué es  un  servidor  con  estado  (stateful  server)  y qué es  un  servidor  sin  estado (stateless server).
