@@ -71,20 +71,13 @@ Media : 0.000112s
 Quitamos los 0 (ceros) para que el calculo sea mas sencillo y con media μ = ~~0.000~~112s -> 112s.
 
 Calculamos la distancia de cada dato a la media (es decir, las desviaciones) y elevamos cada una de esas distancias al cuadrado.
-$$
-\sqrt {\left( \dfrac{   \sum  | X - \mu|^2}{N} \right)} = \dfrac{1089 + 16 + 178 +  81 + 1509 +36 + 121 + 40 + 64}{10} ≈ 313
-$$
-
-$$
-\sqrt{313} ≈ 17,6
-$$
 
 
-
+![Sumatoria para calcular las distancias de los cuadrados.](images/sumatoria.png).
 
 
 **Promedio -- Media aritmética(μ): 0.000112s**
-**Desviación estándar (σ) 0.000018s **
+**Desviación estándar (σ) 0.000018s**
 
 <u>*Comunicación 10*</u><sup>4</sup>
 
