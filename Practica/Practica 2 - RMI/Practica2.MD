@@ -43,14 +43,40 @@
    escribir:  dado  un  nombre  de  archivo,  una  cantidad  de  bytes  determinada,  y  un  buffer  a partir del cual están los datos, se escriben los datos en el archivo dado. Si el archivo existe, los datos se agregan al final, si el archivo no existe, se crea y se le escriben los datos. En todos los casos se retorna la cantidad de bytes escritos. 
    >
    b. Implemente  un  cliente  RMI  del  servidor  anterior  que  copie  un  archivo  del  sistema  de archivos del servidor en el sistema de archivos local y genere una copia del mismo archivo en el sistema de archivos del servidor. En todos los casos se deben usar las operaciones de lectura y escritura del servidor definidas en el item anterior, sin cambios específicos del servidor para este item en particular. Al finalizar la ejecución del cliente deben quedar tres archivos en total: el original en el lado del servidor, una copia del original en el lado del cliente y una copia en el servidor del archivo original. El comando diff no debe identificar ninguna diferencia entre ningún par de estos tres archivos 
+   >
+   Utilizamos la estructura de archivos de ejemplo, y definimos una interfaz con 3 metodos, list, read & write.
+
+   Tanto el cliente como el servidor, se alimentan de una interfaz llamada IfaceFTServer donde la clase que los implementa es la clase FTServer.
+
+   Luego, se implementa un cliente que interactuá contra el server, con los comandos básicos. Esto se hizo en la clase FTClient. El servidor utiliza la implementación de la clase FTServer y corre a instancia de un objeto de la clase StartRemoteObject.
+   >
 
 4. Investigue    si    es    posible    que    varias    invocaciones    remotas    estén    ejecutándose concurrentemente  y  si  esto  es  apropiado  o  no  para  el  servidor  de  archivos  del  ejercicio anterior.  En  caso  de  que  no  sea  apropiado,  analice  si  es  posible  proveer  una  solución (enunciar/describir   una   solución,   no   es   necesario   implementarla). Nota:   diseñe   un experimento  con  el  que  se  pueda  demostrar  fehacientemente  que  dos  o  más  invocaciones remotas se ejecutan concurrentemente o no. 
 
-5. Tiempos de respuesta de una invocación: 
+Al funciona en Java, RMI permite concurrencia nativa, pero el principal inconveniente en RMI, es que no maneja multihilos de una manera segura, es decir que las invocaciones pueden causar inconsistencia sobre los recursos del servidor. 
+Se puede solucionar, utilizando mecanismos para sincronizaron, aunque RMI no provee ninguno por cuenta propia.
+
+En la implementación se cuenta con 2 comandos "seguros" list y read, por otro lado el comando write no lo es.
+
+Los comandos no seguros tiene el inconveniente de la perdida de datos en un servidor.
+Para demostrar la concurrencia de de RMI, utilizamos un comando muy simple 'timeout' que realiza un sleep de 3 minutos, para poder ver la ejecución de dos clientes requiriendo del mismo servidor.
+![Demostración de concurrencia](images/concurrencia.png)
+
+1. Tiempos de respuesta de una invocación: 
 
    a. Diseñe un experimento que muestre el tiempo de respuesta mínimo de una invocación con JAVA RMI. Muestre promedio y desviación estándar de tiempo respuesta.
 
+   Realizamos un .sh que ejecuta una serie de pasos donde colecta 10 comandos times de FTClient, y a través de funciones *Math's de python*  guarda en una carpeta /resultados , en time.dat los 10 datos de times, y crea un csv, guardando el promedio y desviación estándar en tiempo de respuesta.
+
+   Dicho script esta en /script y se ejecuta con ./script/run --build
+
+   La desviación estándar obtenida fue de 14098710, y su promedio (media): 485568.
+
+
+   Nota: --build es necesario para crear la estructura de los archivos .class para ejecutar rmiregistry y StartRemoteObject para poder instanciar el servidor, para que el FTClient pueda enviarle mensajes.
+
    b. Investigue los timeouts relacionados con RMI. Como mínimo, verifique si existe un timeout predefinido. Si existe, indique de cuanto es el tiempo y si podría cambiarlo. Si no existe, proponga alguna forma de evitar que el cliente quede esperando indefinidamente. 
 
-
+   El Paquete **java.rmi** no cuenta con una función timeout configurable, se puede utilizar del paquete **sun.rmi**, el cual cuenta con un método personalizado.
+   Ademas se podria utilizar un timer o alguna herramienta similar, pero *java.rmi* no brinda esta funcion.
 
