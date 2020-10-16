@@ -50,15 +50,15 @@ public class FTClient {
                                 }
                         }
 
-                        System.out.println("El archivo fue leído correctamente");
+                        System.out.println("El archivo fue leido correctamente");
                 } catch (RemoteException e) {
-                        System.err.println("Error de Conexión!");
+                        System.err.println("Error de Conexion!");
                         e.printStackTrace();
                 } catch (IOException e) {
                         System.err.println("Error con los archivos locales");
                         e.printStackTrace();
                 } catch (Exception e) {
-                        System.err.println("Excepción general!");
+                        System.err.println("Excepcion general!");
                         e.printStackTrace();
                 }
         }
@@ -86,13 +86,13 @@ public class FTClient {
                         fis.close();
                         System.out.println("El archivo fue escrito correctamente");
                 } catch (RemoteException e) {
-                        System.err.println("Error de Conexión!");
+                        System.err.println("Error de Conexion!");
                         e.printStackTrace();
                 } catch (IOException e) {
                         System.err.println("Error con los archivos locales");
                         e.printStackTrace();
                 } catch (Exception e) {
-                        System.err.println("Excepción general!");
+                        System.err.println("Excepcion general!");
                         e.printStackTrace();
                 }
         }
@@ -103,10 +103,10 @@ public class FTClient {
                         String listReturn = remote.list(src, listView);
                         System.out.println(listReturn);
                 } catch (RemoteException e) {
-                        System.err.println("Error de Conexión!");
+                        System.err.println("Error de Conexion!");
                         e.printStackTrace();
                 } catch (Exception e) {
-                        System.err.println("Excepción general!");
+                        System.err.println("Excepcion general!");
                         e.printStackTrace();
                 }
         }
@@ -116,7 +116,7 @@ public class FTClient {
 
                 /* Look for hostname and msg length in the command line */
                 if (argv.length < 1) {
-                        System.out.printf("Utilización: cliente\n"
+                        System.out.printf("Utilizacion: cliente\n"
                                         + "\t- write or add --src <local> --dest <remote>: Agrega un archivo de <local> a <remote> \n"
                                         + "\t- read or get --dest <local> --src <remote>: Almacene un archivo de <local> en <remote>\n"
                                         + "\t- ls or list --src <remote/directory>: List files from <remote/directory>\n"
@@ -168,7 +168,7 @@ public class FTClient {
                                 endTime = System.nanoTime();
 
                                 if (verboseMode)
-                                        System.out.printf("Tomó: %d ms\n", (endTime - startTime) / 1000000);
+                                        System.out.printf("Tomo: %d ms\n", (endTime - startTime) / 1000000);
                                 break;
 
                         case "write":
@@ -178,7 +178,7 @@ public class FTClient {
                                 endTime = System.nanoTime();
 
                                 if (verboseMode)
-                                        System.out.printf("Tomó: %d ms\n", (endTime - startTime) / 1000000);
+                                        System.out.printf("Tomo: %d ms\n", (endTime - startTime) / 1000000);
                                 break;
 
                         case "list":
@@ -188,7 +188,7 @@ public class FTClient {
                                 endTime = System.nanoTime();
 
                                 if (verboseMode)
-                                        System.out.printf("Tomó: %d ms\n", (endTime - startTime) / 1000000);
+                                        System.out.printf("Tomo: %d ms\n", (endTime - startTime) / 1000000);
                                 break;
 
                         case "rw":
@@ -229,7 +229,7 @@ public class FTClient {
                                 break;
                         }
                 } catch (Exception e) {
-                        System.err.println("Excepción general!");
+                        System.err.println("Excepcion general!");
                         e.printStackTrace();
                 }
         }

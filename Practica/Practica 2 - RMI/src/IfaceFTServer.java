@@ -28,3 +28,4 @@ public interface IfaceFTServer extends Remote {
       /* It will be possible to invoke this method from an application in other JVM */
       public Boolean timeout() throws RemoteException;
 }
+ 
