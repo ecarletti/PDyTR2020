@@ -16,17 +16,18 @@ public class FileServiceImpl extends FileServiceGrpc.FileServiceImplBase {
 	private BufferedOutputStream mBufferedOutputStream = null;
 
 	@Override
-	public StreamObserver<ReadRequest> readFile(final StreamObserver<ReadResponse> responseObserver) {
-		return new StreamObserver<ReadRequest>() {
+	public StreamObserver<WriteRequest> writeFile(final StreamObserver<WriteResponse> responseObserver) {
+		return new StreamObserver<WriteRequest>() {
 			int mmCount = 0;
 
 			@Override
-			public void onNext(ReadRequest request) {
+			public void onNext(WriteRequest request) {
 				mmCount++;
 
 				byte[] data = request.getData().toByteArray();
 				long offset = request.getOffset();
-				String name = request.getName();
+				String src = request.getSrc();
+				String dest = request.getDest();
 				try {
 					if (mBufferedOutputStream == null) {
 						// timestamp for name of receive file
@@ -35,7 +36,7 @@ public class FileServiceImpl extends FileServiceGrpc.FileServiceImplBase {
 						Files.createDirectories(Paths.get("store"));
 						// store de receive file
 						mBufferedOutputStream = new BufferedOutputStream(
-								new FileOutputStream("store/receive_" + timeStamp));
+								new FileOutputStream("store/" + dest));
 					}
 					mBufferedOutputStream.write(data);
 					mBufferedOutputStream.flush();
@@ -51,7 +52,7 @@ public class FileServiceImpl extends FileServiceGrpc.FileServiceImplBase {
 
 			@Override
 			public void onCompleted() {
-				responseObserver.onNext(ReadResponse.newBuilder().setStatus(mStatus).setMessage(mMessage).build());
+				responseObserver.onNext(WriteResponse.newBuilder().setStatus(mStatus).setMessage(mMessage).build());
 				responseObserver.onCompleted();
 				if (mBufferedOutputStream != null) {
 					try {
