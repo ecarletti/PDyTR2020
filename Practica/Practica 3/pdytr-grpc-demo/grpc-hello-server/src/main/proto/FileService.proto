@@ -6,6 +6,7 @@ option java_multiple_files = true;
 
 service FileService {
 	rpc WriteFile(stream WriteRequest) returns (WriteResponse) {}
+	rpc ReadFile(stream ReadRequest) returns (ReadResponse) {}
 }
 
 message WriteRequest {
@@ -16,6 +17,18 @@ message WriteRequest {
 }
 
 message WriteResponse {
+	int32 status = 1;
+	string message = 2;
+}
+
+message ReadRequest {
+	string src = 1;
+	string dest = 2;
+	bytes data = 3;
+	int64 offset = 4;
+}
+
+message ReadResponse {
 	int32 status = 1;
 	string message = 2;
 }

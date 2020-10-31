@@ -49,7 +49,7 @@ public class UploadFileClient {
 		mChannel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
 	}
 
-	public void startStream(final String src, final String dest) {
+	public void writeStream(final String src, final String dest) {
 		logger.info("tid: " + Thread.currentThread().getId() + ", Will try to writeFile");
 		StreamObserver<WriteResponse> responseObserver = new StreamObserver<WriteResponse>() {
 
@@ -85,6 +85,54 @@ public class UploadFileClient {
 				while ((size = bInputStream.read(buffer)) > 0) {
 					ByteString byteString = ByteString.copyFrom(buffer, 0, size);
 					WriteRequest req = WriteRequest.newBuilder().setSrc(src).setDest(dest).setData(byteString).setOffset(size)
+							.build();
+					requestObserver.onNext(req);
+				}
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		} catch (RuntimeException e) {
+			requestObserver.onError(e);
+			throw e;
+		}
+		requestObserver.onCompleted();
+	}
+
+
+	public void readStram(final String src, final String dest) {
+		logger.info("tid: " + Thread.currentThread().getId() + ", Will try to writeFile");
+		StreamObserver<ReadResponse> responseObserver = new StreamObserver<ReadResponse>() {
+
+			@Override
+			public void onNext(ReadResponse value) {
+				logger.info("Client response onNext");
+			}
+
+			@Override
+			public void onError(Throwable t) {
+				logger.info("Client response onError");
+			}
+
+			@Override
+			public void onCompleted() {
+				logger.info("Client response onCompleted");
+			}
+		};
+
+		StreamObserver<ReadRequest> requestObserver = mAsyncStub.readFile(responseObserver);
+
+		try {
+			File file = new File("store/" + src);
+			try {
+				BufferedInputStream bInputStream = new BufferedInputStream(new FileInputStream(file));
+				int bufferSize = 512 * 1024; // 512k
+				byte[] buffer = new byte[bufferSize];
+				int size = 0;
+				while ((size = bInputStream.read(buffer)) > 0) {
+					ByteString byteString = ByteString.copyFrom(buffer, 0, size);
+					ReadRequest req = ReadRequest.newBuilder().setSrc(src).setDest(dest).setData(byteString).setOffset(size)
 							.build();
 					requestObserver.onNext(req);
 				}
@@ -204,7 +252,7 @@ public class UploadFileClient {
 			case "read":
 			case "get":
 				startTime = System.nanoTime();
-				// read(remote);
+				client.readStram(src, dest);
 				endTime = System.nanoTime();
 
 				System.out.printf("Tomo: %d ms\n", (endTime - startTime) / 1000000);
@@ -213,7 +261,7 @@ public class UploadFileClient {
 			case "write":
 			case "add":
 				startTime = System.nanoTime();
-				client.startStream(src, dest);
+				client.writeStream(src, dest);
 				endTime = System.nanoTime();
 
 				System.out.printf("Tomo: %d ms\n", (endTime - startTime) / 1000000);
