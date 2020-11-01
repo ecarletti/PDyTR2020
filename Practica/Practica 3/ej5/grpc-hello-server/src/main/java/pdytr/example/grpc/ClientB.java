@@ -34,7 +34,7 @@ public class ClientB
         long startTime = System.nanoTime();
         try {
           // Finally, make the call using the stub
-          GreetingServiceOuterClass.HelloResponse response = stub.withDeadlineAfter(dl, TimeUnit.MILLISECONDS).greeting(request);
+          GreetingServiceOuterClass.HelloResponse response = stub.withDeadlineAfter(dl, TimeUnit.MICROSECONDS).greeting(request);
         } catch (Exception e) {
         e.printStackTrace();
         }
