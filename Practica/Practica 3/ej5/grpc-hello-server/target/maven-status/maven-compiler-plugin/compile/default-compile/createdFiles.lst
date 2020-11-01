@@ -2,6 +2,7 @@ pdytr/example/grpc/GreetingServiceGrpc$MethodHandlers.class
 pdytr/example/grpc/GreetingServiceGrpc$GreetingServiceMethodDescriptorSupplier.class
 pdytr/example/grpc/GreetingServiceOuterClass$HelloRequestOrBuilder.class
 pdytr/example/grpc/GreetingServiceGrpc$GreetingServiceFutureStub.class
+pdytr/example/grpc/ClientC.class
 pdytr/example/grpc/GreetingServiceGrpc$GreetingServiceImplBase.class
 pdytr/example/grpc/GreetingServiceOuterClass$HelloRequest$Builder.class
 pdytr/example/grpc/GreetingServiceGrpc$GreetingServiceFileDescriptorSupplier.class
@@ -16,5 +17,8 @@ pdytr/example/grpc/GreetingServiceOuterClass.class
 pdytr/example/grpc/GreetingServiceOuterClass$HelloResponse$Builder.class
 pdytr/example/grpc/GreetingServiceOuterClass$1.class
 pdytr/example/grpc/GreetingServiceGrpc$GreetingServiceBlockingStub.class
+pdytr/example/grpc/AppC.class
 pdytr/example/grpc/GreetingServiceOuterClass$HelloRequest.class
+pdytr/example/grpc/GreetingServiceImplC.class
+pdytr/example/grpc/ClientA.class
 pdytr/example/grpc/GreetingServiceGrpc$1.class
