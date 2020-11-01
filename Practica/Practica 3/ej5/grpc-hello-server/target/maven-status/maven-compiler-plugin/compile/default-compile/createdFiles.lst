@@ -10,6 +10,7 @@ pdytr/example/grpc/GreetingServiceOuterClass$HelloResponseOrBuilder.class
 pdytr/example/grpc/GreetingServiceOuterClass$HelloResponse$1.class
 pdytr/example/grpc/GreetingServiceOuterClass$HelloResponse.class
 pdytr/example/grpc/GreetingServiceOuterClass$HelloRequest$1.class
+pdytr/example/grpc/ClientB.class
 pdytr/example/grpc/GreetingServiceGrpc$GreetingServiceStub.class
 pdytr/example/grpc/GreetingServiceGrpc.class
 pdytr/example/grpc/GreetingServiceGrpc$GreetingServiceBaseDescriptorSupplier.class
