@@ -17,6 +17,7 @@ public class GreetingServiceImplC extends GreetingServiceGrpc.GreetingServiceImp
 
     Context current = Context.current();
     try {
+      //https://grpc.github.io/grpc-java/javadoc/
       while (!current.isCancelled()) {
         Thread.sleep(100);
       }
