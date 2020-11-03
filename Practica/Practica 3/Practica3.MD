@@ -56,6 +56,14 @@ Existen los siguientes tipos de API en gRPC:
     b.- Investigue si es posible que varias invocaciones remotas esten ejecutandose concurrentemente y si esto es apropiado o no para el servidor de archivos del ejercicio anterior. En caso de que no se apropiado, analice si es posible proveer una solucion (enunciar/describir una solucion, no es necesario implementarla).
     **Nota:** diseñe un experimento con el que se pueda demostrar fehacientemente que dos o mas invocaciones remotas se ejecutan concurrentemente o no.
 
+Al funciona en Java, gRPC permite concurrencia nativa, ademas manjer multihilos y tiene funciones tanto sincrónicas como asincrónicas para poder tener una iteraccion con  los hilos de manera segura.
+
+Se realizo un experimento donde el Cliente A y el Cliente B hacen peticiones concurrentemente sobre el servidor.
+
+![Consulta concurrente](images/4B.png)
+
+Nota: para correr el experimento primero levantar el *App.java* y luego correr el script *runClient.sh*
+
 5) Timeouts en gRPC:
    a.- Desarrollar un experimento que muestre el timeout definido para las llamadas gRPC y el promedio de tiempo de una llamada gRPC.
 
