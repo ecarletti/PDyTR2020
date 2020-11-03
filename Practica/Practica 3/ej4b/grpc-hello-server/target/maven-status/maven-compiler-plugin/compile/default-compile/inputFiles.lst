@@ -1,0 +1,5 @@
+/home/ezequiel/Facultad/PDyTR/PDyTR2020/Practica/Practica 3/ej4b/grpc-hello-server/src/main/java/pdytr/example/grpc/App.java
+/home/ezequiel/Facultad/PDyTR/PDyTR2020/Practica/Practica 3/ej4b/grpc-hello-server/target/generated-sources/protobuf/java/pdytr/example/grpc/GreetingServiceOuterClass.java
+/home/ezequiel/Facultad/PDyTR/PDyTR2020/Practica/Practica 3/ej4b/grpc-hello-server/src/main/java/pdytr/example/grpc/GreetingServiceImpl.java
+/home/ezequiel/Facultad/PDyTR/PDyTR2020/Practica/Practica 3/ej4b/grpc-hello-server/target/generated-sources/protobuf/grpc-java/pdytr/example/grpc/GreetingServiceGrpc.java
+/home/ezequiel/Facultad/PDyTR/PDyTR2020/Practica/Practica 3/ej4b/grpc-hello-server/src/main/java/pdytr/example/grpc/Client.java
