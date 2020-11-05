@@ -20,8 +20,7 @@ public class UploadFileServer {
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			@Override
 			public void run() {
-				// Use stderr here since the logger may have been reset by its JVM shutdown
-				// hook.
+				// Use stderr here since the logger may have been reset by its JVM shutdown hook.
 				System.err.println("*** shutting down gRPC mServer since JVM is shutting down");
 				UploadFileServer.this.stop();
 				System.err.println("*** mServer shut down");

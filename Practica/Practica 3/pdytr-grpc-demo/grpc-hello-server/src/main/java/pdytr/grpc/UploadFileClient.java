@@ -1,6 +1,8 @@
 package pdytr.grpc;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -9,7 +11,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import com.google.protobuf.ByteString;
-
+import java.io.*;
+import io.grpc.*;
 import gnu.getopt.Getopt;
 import gnu.getopt.LongOpt;
 import io.grpc.ManagedChannel;
@@ -28,7 +31,6 @@ public class UploadFileClient {
 	public static Integer initialPosition = 0;
 
 	private final ManagedChannel mChannel;
-	private final FileServiceGrpc.FileServiceBlockingStub mBlockingStub;
 	private final FileServiceGrpc.FileServiceStub mAsyncStub;
 
 	public UploadFileClient(String host, int port) {
@@ -41,7 +43,6 @@ public class UploadFileClient {
 
 	UploadFileClient(ManagedChannel channel) {
 		this.mChannel = channel;
-		mBlockingStub = FileServiceGrpc.newBlockingStub(channel);
 		mAsyncStub = FileServiceGrpc.newStub(channel);
 	}
 
@@ -84,7 +85,7 @@ public class UploadFileClient {
 				int size = 0;
 				while ((size = bInputStream.read(buffer)) > 0) {
 					ByteString byteString = ByteString.copyFrom(buffer, 0, size);
-					WriteRequest req = WriteRequest.newBuilder().setSrc(src).setDest(dest).setData(byteString).setOffset(size)
+					WriteRequest req = WriteRequest.newBuilder().setDest(dest).setData(byteString).setOffset(size)
 							.build();
 					requestObserver.onNext(req);
 				}
@@ -100,14 +101,38 @@ public class UploadFileClient {
 		requestObserver.onCompleted();
 	}
 
-
 	public void readStram(final String src, final String dest) {
-		logger.info("tid: " + Thread.currentThread().getId() + ", Will try to writeFile");
+		logger.info("tid: " + Thread.currentThread().getId() + ", Will try to readFile");
+		DataOutputStream stream;
+		FileOutputStream out;
+		try {
+			File file = new File(dest);
+			out = new FileOutputStream(file, true);
+			stream = new DataOutputStream(out);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	
 		StreamObserver<ReadResponse> responseObserver = new StreamObserver<ReadResponse>() {
+			int totalBytesRead = 0;
 
 			@Override
-			public void onNext(ReadResponse value) {
-				logger.info("Client response onNext");
+			public void onNext(ReadResponse response) {
+				System.out.println("---------------------------");
+				try {
+					byte[] buffer = response.getData().toByteArray();
+					int bytesRead = response.getBytesRead();
+					totalBytesRead += bytesRead;
+					// stream.write(buffer, 0, bytesActualesLeidos);
+					// stream.flush();
+					// out.flush();
+				
+					logger.info("bytes totales: " +  totalBytesRead);
+					logger.info("bytes actual: " + bytesRead);
+				} catch (Exception e) {
+					// e.printStackTrace();
+					logger.info("ERROR");
+				}
 			}
 
 			@Override
@@ -122,7 +147,7 @@ public class UploadFileClient {
 		};
 
 		StreamObserver<ReadRequest> requestObserver = mAsyncStub.readFile(responseObserver);
-
+		
 		try {
 			File file = new File("store/" + src);
 			try {
@@ -130,11 +155,12 @@ public class UploadFileClient {
 				int bufferSize = 512 * 1024; // 512k
 				byte[] buffer = new byte[bufferSize];
 				int size = 0;
+				int offset = 0;
 				while ((size = bInputStream.read(buffer)) > 0) {
-					ByteString byteString = ByteString.copyFrom(buffer, 0, size);
-					ReadRequest req = ReadRequest.newBuilder().setSrc(src).setDest(dest).setData(byteString).setOffset(size)
-							.build();
+					ReadRequest req = ReadRequest.newBuilder().setSrc(src).setOffset(
+							offset).setAmount(bufferSize).build();
 					requestObserver.onNext(req);
+					offset += bufferSize;
 				}
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
@@ -265,26 +291,6 @@ public class UploadFileClient {
 				endTime = System.nanoTime();
 
 				System.out.printf("Tomo: %d ms\n", (endTime - startTime) / 1000000);
-				break;
-
-			case "time":
-				startTime = System.nanoTime();
-				// remote.time();
-				endTime = System.nanoTime();
-
-				System.out.println(endTime - startTime);
-				break;
-
-			case "timeout":
-				System.out.println("Ejecutando el comando: timeout...");
-
-				// Boolean ret = remote.timeout();
-
-				// if (ret)
-				// System.out.println("Completado!");
-				// else
-				// System.out.println("Timeout excedido");
-
 				break;
 
 			default:

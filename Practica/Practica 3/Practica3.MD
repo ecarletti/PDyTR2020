@@ -74,13 +74,18 @@ Lo que hace que GRPC utilice una capa de abstaccion en su manejo en lo valores d
 a.- Defina e implemente con gRPC un servidor. Documente todas las decisiones tomadas.
 
 Archivos utilizados:
-UploadFileServer.java
+Para este punto se implementaron funciones basicas para el manejo de archivos(lectura y escritura).
 
-UploadFileClient.java
+- **FileService.proto**: Se definen las estructuras de los mensajes y servicios del protocolo. Los mensajes son utilizados para definir la composicion de una peticion o respuesta, las cuales seran utilizados por un servicio.
 
-FileServiceImpl.java
+- **FileServiceImpl.java**: Implementa los servicios declarados en `FileService.proto`, en concreto las funciones onNext, onCompleted, onError del protocolo gRPC. Toma los valores de las peticiones para llevar a cabo las operaciones correspondientes.
 
-FileService.proto
+- **UploadFileServer.java**: El proposito de esta clase Java es hacer de servidor, crea un socket de que se queda escuchando indefinidamente en un puerto establecido esperando nuevas peticiones.
+
+- **UploadFileClient.java**: La clase cliente es la encargada de crear y enviar peticiones al servicio de gRPC. Por cada peticion los datos se dividen en buffers de 512kb, con el fin de evitar problemas con archivos de gran tamaño.
+
+En la implementacion del servidor 
+
 
 b.- Investigue si es posible que varias invocaciones remotas esten ejecutandose concurrentemente y si esto es apropiado o no para el servidor de archivos del ejercicio anterior. En caso de que no se apropiado, analice si es posible proveer una solucion (enunciar/describir una solucion, no es necesario implementarla).
 **Nota:** diseñe un experimento con el que se pueda demostrar fehacientemente que dos o mas invocaciones remotas se ejecutan concurrentemente o no.
@@ -101,7 +106,7 @@ Nota: para correr el experimento primero levantar el *App.java* y luego correr e
    >gRPC allows clients to specify how long they are willing to wait for an RPC to complete before the RPC is terminated with a DEADLINE_EXCEEDED error. On the server side, the server can query to see if a particular RPC has timed out, or how much time is left to complete the RPC.
    >Specifying a deadline or timeout is language specific: some language APIs work in terms of timeouts (durations of time), and some language APIs work in terms of a deadline (a fixed point in time) and may or maynot have a default deadline.
 
-   [Deadlines](   https://grpc.io/blog/deadlines/)
+   [Deadlines](https://grpc.io/blog/deadlines/)
 
 
 
