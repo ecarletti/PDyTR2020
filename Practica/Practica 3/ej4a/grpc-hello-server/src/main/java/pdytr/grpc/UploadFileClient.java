@@ -1,8 +1,6 @@
 package pdytr.grpc;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.FileOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -11,8 +9,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import com.google.protobuf.ByteString;
-import java.io.*;
-import io.grpc.*;
 import gnu.getopt.Getopt;
 import gnu.getopt.LongOpt;
 import io.grpc.ManagedChannel;
@@ -55,8 +51,8 @@ public class UploadFileClient {
 		StreamObserver<WriteResponse> responseObserver = new StreamObserver<WriteResponse>() {
 
 			@Override
-			public void onNext(WriteResponse value) {
-				logger.info("Client response onNext");
+			public void onNext(WriteResponse res) {
+				System.out.println("------- RESPONSE: " + res.getBytesWrite() + " bytes write");
 			}
 
 			@Override
@@ -89,6 +85,7 @@ public class UploadFileClient {
 							.build();
 					requestObserver.onNext(req);
 				}
+				bInputStream.close();
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -103,35 +100,22 @@ public class UploadFileClient {
 
 	public void readStram(final String src, final String dest) {
 		logger.info("tid: " + Thread.currentThread().getId() + ", Will try to readFile");
-		DataOutputStream stream;
-		FileOutputStream out;
-		try {
-			File file = new File(dest);
-			out = new FileOutputStream(file, true);
-			stream = new DataOutputStream(out);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	
+
 		StreamObserver<ReadResponse> responseObserver = new StreamObserver<ReadResponse>() {
 			int totalBytesRead = 0;
 
 			@Override
 			public void onNext(ReadResponse response) {
-				System.out.println("---------------------------");
 				try {
 					byte[] buffer = response.getData().toByteArray();
 					int bytesRead = response.getBytesRead();
 					totalBytesRead += bytesRead;
-					// stream.write(buffer, 0, bytesActualesLeidos);
-					// stream.flush();
-					// out.flush();
-				
-					logger.info("bytes totales: " +  totalBytesRead);
+					// file.write(buffer, 0, totalBytesRead);
+
+					logger.info("bytes totales: " + totalBytesRead);
 					logger.info("bytes actual: " + bytesRead);
 				} catch (Exception e) {
-					// e.printStackTrace();
-					logger.info("ERROR");
+					e.printStackTrace();
 				}
 			}
 
@@ -147,30 +131,11 @@ public class UploadFileClient {
 		};
 
 		StreamObserver<ReadRequest> requestObserver = mAsyncStub.readFile(responseObserver);
-		
-		try {
-			File file = new File("store/" + src);
-			try {
-				BufferedInputStream bInputStream = new BufferedInputStream(new FileInputStream(file));
-				int bufferSize = 512 * 1024; // 512k
-				byte[] buffer = new byte[bufferSize];
-				int size = 0;
-				int offset = 0;
-				while ((size = bInputStream.read(buffer)) > 0) {
-					ReadRequest req = ReadRequest.newBuilder().setSrc(src).setOffset(
-							offset).setAmount(bufferSize).build();
-					requestObserver.onNext(req);
-					offset += bufferSize;
-				}
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		} catch (RuntimeException e) {
-			requestObserver.onError(e);
-			throw e;
-		}
+
+		int bufferSize = 512 * 1024; // 512k
+		int offset = 0;
+		ReadRequest req = ReadRequest.newBuilder().setSrc(src).setOffset(offset).setAmount(bufferSize).build();
+		requestObserver.onNext(req);
 		requestObserver.onCompleted();
 	}
 
@@ -178,14 +143,10 @@ public class UploadFileClient {
 		int c;
 		String arg;
 		LongOpt[] longopts = new LongOpt[8];
-		StringBuffer listViewSb = new StringBuffer("0");
 
-		longopts[0] = new LongOpt("all", LongOpt.NO_ARGUMENT, listViewSb, '1');
-		longopts[1] = new LongOpt("bytes", LongOpt.REQUIRED_ARGUMENT, null, 'a');
-		longopts[2] = new LongOpt("pos", LongOpt.REQUIRED_ARGUMENT, null, 'p');
-		longopts[3] = new LongOpt("host", LongOpt.REQUIRED_ARGUMENT, null, 'h');
-		longopts[4] = new LongOpt("src", LongOpt.REQUIRED_ARGUMENT, null, 's');
-		longopts[5] = new LongOpt("dest", LongOpt.REQUIRED_ARGUMENT, null, 'd');
+		longopts[0] = new LongOpt("host", LongOpt.REQUIRED_ARGUMENT, null, 'h');
+		longopts[1] = new LongOpt("src", LongOpt.REQUIRED_ARGUMENT, null, 's');
+		longopts[2] = new LongOpt("dest", LongOpt.REQUIRED_ARGUMENT, null, 'd');
 
 		Getopt g = new Getopt("flags", argv, "vbls:d:h:a:p:", longopts);
 		g.setOpterr(false);
@@ -201,9 +162,6 @@ public class UploadFileClient {
 				System.out.println("option %s" + longopts[g.getLongind()].getName() + " with arg %s"
 						+ ((arg != null) ? arg : "null"));
 				break;
-			case 'l':
-				listViewSb = new StringBuffer("1");
-				break;
 			case 's':
 				src = g.getOptarg();
 				break;
@@ -213,24 +171,10 @@ public class UploadFileClient {
 			case 'h':
 				host = g.getOptarg();
 				break;
-			case 'a':
-				isSetBytesFlag = true;
-				bytes = new Integer(g.getOptarg());
-				break;
-			case 'p':
-				initialPosition = new Integer(g.getOptarg());
-				break;
-			case '?':
-				/* getopt_long already printed an error message. */
-				break;
 			default:
 				System.exit(0);
 			}
 		}
-
-		listViewSb.trimToSize();
-
-		listView = new Integer(listViewSb.toString()) != 0;
 
 		for (int i = g.getOptind() + 1; i < argv.length; i++) {
 			System.out.println("Non option argv element: " + argv[i] + "\n");

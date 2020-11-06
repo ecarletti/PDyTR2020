@@ -1,9 +1,8 @@
 package pdytr.grpc;
 
-import java.io.BufferedOutputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.file.Files;
@@ -14,7 +13,7 @@ import com.google.protobuf.ByteString;
 import io.grpc.stub.StreamObserver;
 
 public class FileServiceImpl extends FileServiceGrpc.FileServiceImplBase {
-	private BufferedOutputStream mBufferedOutputStream = null;
+	private DataOutputStream mOutputStream = null;
 
 	@Override
 	public StreamObserver<WriteRequest> writeFile(final StreamObserver<WriteResponse> responseObserver) {
@@ -26,15 +25,15 @@ public class FileServiceImpl extends FileServiceGrpc.FileServiceImplBase {
 				int offset = request.getOffset();
 				String dest = request.getDest();
 				try {
-					if (mBufferedOutputStream == null) {
+					if (mOutputStream == null) {
 						// create directory store if not exists
 						Files.createDirectories(Paths.get("store"));
 						// store de receive file
-						mBufferedOutputStream = new BufferedOutputStream(
+						mOutputStream = new DataOutputStream(
 								new FileOutputStream("store/" + dest));
 					}
-					mBufferedOutputStream.write(data);
-					mBufferedOutputStream.flush();
+					mOutputStream.write(data, 0, offset);
+					mOutputStream.flush();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -42,20 +41,19 @@ public class FileServiceImpl extends FileServiceGrpc.FileServiceImplBase {
 
 			@Override
 			public void onError(Throwable t) {
-
 			}
 
 			@Override
 			public void onCompleted() {
-				responseObserver.onNext(WriteResponse.newBuilder().setBytesWrite(300).build());
+				responseObserver.onNext(WriteResponse.newBuilder().setBytesWrite(mOutputStream.size()).build());
 				responseObserver.onCompleted();
-				if (mBufferedOutputStream != null) {
+				if (mOutputStream != null) {
 					try {
-						mBufferedOutputStream.close();
+						mOutputStream.close();
 					} catch (IOException e) {
 						e.printStackTrace();
 					} finally {
-						mBufferedOutputStream = null;
+						mOutputStream = null;
 					}
 				}
 			}
@@ -83,28 +81,28 @@ public class FileServiceImpl extends FileServiceGrpc.FileServiceImplBase {
 					file.seek(offset);
 					bytesReadServerFile = file.read(buff, 0, amount);
 					file.close();
+
 					byteString = ByteString.copyFrom(buff);
-				}catch (Exception e) {
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 
 			@Override
 			public void onError(Throwable t) {
-
 			}
 
 			@Override
 			public void onCompleted() {
 				responseObserver.onNext(ReadResponse.newBuilder().setBytesRead(bytesReadServerFile).setData(byteString).build());
 				responseObserver.onCompleted();
-				if (mBufferedOutputStream != null) {
+				if (mOutputStream != null) {
 					try {
-						mBufferedOutputStream.close();
+						mOutputStream.close();
 					} catch (IOException e) {
 						e.printStackTrace();
 					} finally {
-						mBufferedOutputStream = null;
+						mOutputStream = null;
 					}
 				}
 			}
