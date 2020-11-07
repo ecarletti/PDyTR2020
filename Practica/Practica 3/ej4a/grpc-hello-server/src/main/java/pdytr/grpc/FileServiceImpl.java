@@ -60,52 +60,50 @@ public class FileServiceImpl extends FileServiceGrpc.FileServiceImplBase {
 		};
 	}
 
-	@Override
-	public StreamObserver<ReadRequest> readFile(final StreamObserver<ReadResponse> responseObserver) {
-		return new StreamObserver<ReadRequest>() {
-			int bytesReadServerFile = 0;
-			ByteString byteString;
-			@Override
-			public void onNext(ReadRequest request) {
-				
-				try {
-					String src = request.getSrc();
-					int offset = request.getOffset();
-					int amount = request.getAmount();
-					byte[] buff = new byte[amount];
-					System.out.println(offset);
+  
+  public void readFile(ReadRequest request, StreamObserver<ReadResponse> responseObserver){
 
-					File fileServer = new File("store/" + src);
-					RandomAccessFile file = new RandomAccessFile(fileServer, "r");
+		int bytesReadServerFile = 0;
+		int offset,amount;
+		String src;
+		ReadResponse response;
+		File fileServer;
+		RandomAccessFile file; 
+		ByteString byteString;
 
-					file.seek(offset);
-					bytesReadServerFile = file.read(buff, 0, amount);
-					file.close();
+		try{
+			// Parametros de ReadRequest mas inicio el buffer
+			src = request.getSrc();
+			offset = request.getOffset();
+			amount = request.getAmount();
+			byte[] buff = new byte[amount];
+					
+			// store > es la carpeta de almacenamiento del servidor
+			fileServer = new File("store/" + src);
+			file = new RandomAccessFile(fileServer, "r");
 
-					byteString = ByteString.copyFrom(buff);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+			// posicion en el archivo
+			file.seek(offset);
+			// read desde esa posicion
+			bytesReadServerFile = file.read(buff, 0, amount);
+			// cierro el archivo
+			file.close();
+
+			byteString = ByteString.copyFrom(buff);
+
+			// Genero ReadResponse
+			response = ReadResponse.newBuilder()
+									.setBytesRead(bytesReadServerFile)
+									.setData(byteString)
+									.build();
+
+			// StreamObserver<ReadResponse> responseObserver = onNext y onCompleted
+			responseObserver.onNext(response); 
+			responseObserver.onCompleted();
+
+		}catch(Exception e){
+			e.printStackTrace();
 			}
-
-			@Override
-			public void onError(Throwable t) {
-			}
-
-			@Override
-			public void onCompleted() {
-				responseObserver.onNext(ReadResponse.newBuilder().setBytesRead(bytesReadServerFile).setData(byteString).build());
-				responseObserver.onCompleted();
-				if (mOutputStream != null) {
-					try {
-						mOutputStream.close();
-					} catch (IOException e) {
-						e.printStackTrace();
-					} finally {
-						mOutputStream = null;
-					}
-				}
-			}
-		};
 	}
+
 }
