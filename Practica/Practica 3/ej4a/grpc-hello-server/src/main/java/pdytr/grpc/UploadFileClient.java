@@ -1,5 +1,7 @@
 package pdytr.grpc;
 
+import io.grpc.*;
+import java.io.*;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,6 +17,10 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
 
+import java.io.DataOutputStream;
+import java.io.FileOutputStream;
+
+
 public class UploadFileClient {
 	private static final Logger logger = Logger.getLogger(UploadFileClient.class.getName());
 	private static final int PORT = 50051;
@@ -25,9 +31,12 @@ public class UploadFileClient {
 	public static Boolean listView = false;
 	public static Integer bytes = 0;
 	public static Integer initialPosition = 0;
+	private static FileOutputStream out;
+	private static DataOutputStream stream;
 
 	private final ManagedChannel mChannel;
 	private final FileServiceGrpc.FileServiceStub mAsyncStub;
+	private final FileServiceGrpc.FileServiceBlockingStub  mBlockingStub;
 
 	public UploadFileClient(String host, int port) {
 		this(ManagedChannelBuilder.forAddress(host, port)
@@ -39,7 +48,10 @@ public class UploadFileClient {
 
 	UploadFileClient(ManagedChannel channel) {
 		this.mChannel = channel;
+		// Stub 
 		mAsyncStub = FileServiceGrpc.newStub(channel);
+		// Block Stub
+		mBlockingStub = FileServiceGrpc.newBlockingStub(channel);
 	}
 
 	public void shutdown() throws InterruptedException {
@@ -98,45 +110,51 @@ public class UploadFileClient {
 		requestObserver.onCompleted();
 	}
 
-	public void readStram(final String src, final String dest) {
+	public void readFile(final String src, final String dest) {
 		logger.info("tid: " + Thread.currentThread().getId() + ", Will try to readFile");
-
-		StreamObserver<ReadResponse> responseObserver = new StreamObserver<ReadResponse>() {
+		
+		try{
+		// destino _ source
+		// ej archivo cancion.mp4> src , dest: prueba, imprime: prueba_cancion.mp4
+			// dest vacio = tmp1 puesto en gnu.
+			File file = new File(dest + "_" + src);
+			file.createNewFile();
+			out = new FileOutputStream(file,true);
+			stream = new DataOutputStream(out);
+            int bufferSize = 512 * 1024; // 512k
+			byte[] buffer = new byte[bufferSize];
 			int totalBytesRead = 0;
+			int endOfFile = 0;
 
-			@Override
-			public void onNext(ReadResponse response) {
-				try {
-					byte[] buffer = response.getData().toByteArray();
-					int bytesRead = response.getBytesRead();
-					totalBytesRead += bytesRead;
-					// file.write(buffer, 0, totalBytesRead);
+			// mientras no termina el archivo creo request, obtengo responses y escribo lo dado por el servidor
+			while(endOfFile != -1){
+                //genero readRequest
+				ReadRequest req = ReadRequest.newBuilder().setSrc(src).setOffset(totalBytesRead).setAmount(bufferSize).build();
 
-					logger.info("bytes totales: " + totalBytesRead);
-					logger.info("bytes actual: " + bytesRead);
-				} catch (Exception e) {
-					e.printStackTrace();
+                //genero respuesta del servidor y obtengo los parametros
+                ReadResponse resp = mBlockingStub.readFile(req);
+                buffer = resp.getData().toByteArray();
+				int bytesRead = resp.getBytesRead();
+				endOfFile = bytesRead;
+				totalBytesRead += bytesRead;
+
+				//write del archivo
+				if (endOfFile != -1){
+					stream.write(buffer, 0, bytesRead);
+					stream.flush();
+					out.flush();
 				}
+
 			}
+			// close file y canal
+            stream.close();
+            out.close();
+            mChannel.shutdownNow();
 
-			@Override
-			public void onError(Throwable t) {
-				logger.info("Client response onError");
-			}
-
-			@Override
-			public void onCompleted() {
-				logger.info("Client response onCompleted");
-			}
-		};
-
-		StreamObserver<ReadRequest> requestObserver = mAsyncStub.readFile(responseObserver);
-
-		int bufferSize = 512 * 1024; // 512k
-		int offset = 0;
-		ReadRequest req = ReadRequest.newBuilder().setSrc(src).setOffset(offset).setAmount(bufferSize).build();
-		requestObserver.onNext(req);
-		requestObserver.onCompleted();
+            System.out.println("Archivo " + src +" leido exitosamente! con un total de " + totalBytesRead + " bytes.");
+        }catch(Exception e){
+            e.printStackTrace();
+        }
 	}
 
 	public static void initParams(String[] argv) {
@@ -188,9 +206,9 @@ public class UploadFileClient {
 		if (argv.length < 1) {
 			System.out.printf("Utilizacion: cliente\n"
 					+ "\t- write or add --src <local> --dest <remote>: Agrega un archivo de <local> a <remote> \n"
-					+ "\t- read or get --dest <local> --src <remote>: Almacene un archivo de <local> en <remote>\n"
-					+ "\t- ls or list --src <remote/directory>: List files from <remote/directory>\n"
-					+ "\t- rw or readwrite --src <local> --dest <remote>: Almacena un archivo de <local> a <remote> y realiza una copia de seguridad en el servidor \n");
+					+ "\t- read or get --dest <local> --src <remote>: Almacene un archivo de <local> en <remote>\n");
+					//+ "\t- ls or list --src <remote/directory>: List files from <remote/directory>\n"
+					//+ "\t- rw or readwrite --src <local> --dest <remote>: Almacena un archivo de <local> a <remote> y realiza una copia de seguridad en el servidor \n");
 			System.exit(1);
 		}
 
@@ -222,7 +240,7 @@ public class UploadFileClient {
 			case "read":
 			case "get":
 				startTime = System.nanoTime();
-				client.readStram(src, dest);
+				client.readFile(src, dest);
 				endTime = System.nanoTime();
 
 				System.out.printf("Tomo: %d ms\n", (endTime - startTime) / 1000000);
