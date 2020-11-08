@@ -52,3 +52,5 @@
 
 `mvn exec:java -Dexec.mainClass="pdytr.grpc.UploadFileServer"`
 
+pub-sub: https://github.com/googleapis/googleapis/blob/7710ead495227e80a0f06ceb66bdf3238d926f77/google/pubsub/v1beta2/pubsub.proto
+https://github.com/googleapis/googleapis/tree/7710ead495227e80a0f06ceb66bdf3238d926f77/google/pubsub/v1beta2

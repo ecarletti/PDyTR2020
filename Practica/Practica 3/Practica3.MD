@@ -1,6 +1,7 @@
 # Práctica 3
 
 1) Utilizando como base el programa ejemplo​1​ de gRPC:
+
    a)  Mostrar experimentos donde se produzcan errores de conectividad del lado del cliente y del lado del servidor. Si es necesario realice cambios mínimos para,por ejemplo,incluir sleep()o exit(),de forma tal que no se reciban comunicaciones o no haya receptor para las comunicaciones.
 
    Se modifico el ejemplo dado por la cátedra para generar errores de conectividad del lado del cliente y del servidor.
@@ -13,6 +14,55 @@
 2) Describir y analizar los tipos de API que tiene gRPC. Desarolle una conclusion acerca de cual es la mejor opcion para los siguientes escenarios:
 
 Existen los siguientes tipos de API en gRPC:
+
+- **Unario**: El cliente envía una **única solicitud al servidor** y obtiene una **única respuesta**, al igual que una llamada de función normal.
+
+   `rpc SayHello(HelloRequest) returns (HelloResponse);`
+
+- **Transmision de servidor**: El cliente **envía una solicitud al servidor** y **obtiene una transmisión para leer una secuencia de mensajes**. El cliente lee el flujo devuelto hasta que no hay más mensajes. gRPC garantiza el orden de los mensajes dentro de una llamada RPC individual.
+
+   `rpc LotsOfReplies(HelloRequest) returns (stream HelloResponse);`
+
+- **Transmision de cliente**: el cliente escribe **una secuencia de mensajes** y los envía al servidor, nuevamente utilizando una transmisión proporcionada. Una vez que el cliente ha terminado de escribir los mensajes, **espera a que el servidor los lea y devuelva su respuesta**. Una vez más, gRPC garantiza el orden de los mensajes dentro de una llamada RPC individual.
+
+   `rpc LotsOfGreetings(stream HelloRequest) returns (HelloResponse);`
+
+- **Transmision bidireccional**: **Ambos lados envían una secuencia de mensajes** mediante una transmisión de lectura y escritura. Los dos flujos **funcionan de forma independiente**, por lo que los clientes y los servidores pueden leer y escribir en el orden que deseen. Se conserva el orden de los mensajes en cada flujo.
+
+   `rpc BidiHello(stream HelloRequest) returns (stream HelloResponse);`
+
+### Casos de uso para los servicos
+
+- Un sistema de pub/sub
+   
+   [Announcing gRPC Alpha for Google Cloud Pub/Sub](https://cloud.google.com/blog/products/gcp/announcing-grpc-alpha-for-google-cloud-pubsub)
+
+   Pub/Sub es un servicio de mensajería asíncrona que separa los servicios que producen eventos de servicios que procesan eventos.
+
+   Este sistema proporciona un mecanismo de comunicación confiable de muchos a muchos entre publicadores y suscriptores de forma independiente, donde el publicador publica mensajes sobre topicos y cada suscriptor crea una suscripción y consume mensajes de el.
+
+   Para su implementacion se necesitara de dos servicios. El servicio de publicador el cual debe encargarse de crear topicos y publicar mensajes en esos topicos.
+   Tambien debe contar con un servicio de suscriptor que debe encargarse de crear nuevas suscripciones para un topico y de obtener los mensajes para cada topico.
+
+   Estas dos acciones trabajan de manera totalmente independiente por lo que pueden aplicarse con el tipo **Unario** de gRPC.
+
+- Un sistema de archivos FTP
+   
+   Para realizar FTP (File Transfer Protocol), una de las API's necesarias es la de okhttp, ya que es un protocolo de red y los sistemas están conectados a una red TCP. Ademas el io.grpc que tiene el core donde tiene funciones para el manejo de archivos como FileOutputStream, FileInputStream, BufferedInputStream,BufferedOutputStream, File, entre otros para poder realizar una transferencia de archivos entre sistemas, basado en la arquitectura cliente-servidor.
+
+   Para su implementacion, se tiene minimamente un servicio de dos llamados rpc, uno es subida de archivos al servidor del tipo **transmision de cliente** ya que el cliente debe enviar los bytes en multiples mensajes, esperar que el servidor los lea y retorne su respuesta.
+
+   El restante se utiliza para la descarga de archivos de tipo **transmision de servidor** en el cual el cliente envía una solicitud al servidor requiriendo la lectura del archivo, luego obtiene una transmisión para leer una secuencia de mensajes que contienen los bytes del archivo.
+   
+- Un sistema de chat
+        
+   Netty seria la mejor solución para generar un chat ya que tiene canales y funciones como eventLoopGroup que nos permite dejar un canal abierto donde se pueden conectar dos clientes e interactuar entre si.
+
+   Para la implementacion de un sistema de chat, se debe tener un servicio de tipo **transmision bidireccional** ya que se necesita que tanto cliente como servidor operen de forma independiente(clientes y servidores pueden leer y escribir en cualquier orden)
+
+   En el lado del servidor, necesitaremos escuchar los mensajes transmitidos entrantes y derivarlos a los usuarios correspondientes.
+
+Paquetes java mas importantes de la api gRPC.
 
 - **io.grpc**: es el core publico de grpc
   - BindableService: Proporciona una forma de vincular una instancia de implementación de servicio al servidor.
@@ -41,28 +91,15 @@ Existen los siguientes tipos de API en gRPC:
 - **io.grpc.testing**: Api de testing.
 - **io.grpc.util**: utilidades de la capa core.
 
-   - Un sistema de pub/sub
-        [Announcing gRPC Alpha for Google Cloud Pub/Sub](https://cloud.google.com/blog/products/gcp/announcing-grpc-alpha-for-google-cloud-pubsub)
-
-        Pub/Sub es un servicio de mensajería asíncrona que separa los servicios que producen eventos de servicios que procesan eventos.
-        El core de grpc maneja eventos asincrónicos, ademas protocolos de buffers (protobuf) y la api stub donde cuenta con io.grpc.stub.AbstractStub con las clases <SubscriberGrpc.SubscriberStub> y PublisherGrpc.PublisherStub.
-   
-   - Un sistema de archivos FTP
-   
-        Para realizar FTP (File Transfer Protocol), una de las API's necesarias es la de okhttp, ya que es un protocolo de red y los sistemas están conectados a una red TCP. Ademas el io.grpc que tiene el core donde tiene funciones para el manejo de archivos como FileOutputStream, FileInputStream, BufferedInputStream,BufferedOutputStream, File, entre otros para poder realizar una transferencia de archivos entre sistemas, basado en la arquitectura cliente-servidor.
-   
-   - Un sistema de chat
-        
-        - Netty seria la mejor solución para generar un chat ya que tiene canales y funciones como eventLoopGroup que nos permite dejar un canal abierto donde se pueden conectar dos clientes e interactuar entre si.
-
 3) Analizar la transparencia de gRPC en cuanto al manejo de parametros de los procedimientos remotos. Considerar lo que sucede en el caso de los valores de retorno. Puede aprovechar el ejemplo provistos.
 
-En el ejemplo podemos ver el valor de retorno de objetos Observers, utilizados tanto por los stubs del cliente como las implementaciones de servicios para enviar o recibir 'stream messages'.
-Para los mensajes salientes, la biblioteca GRPC proporciona un StreamObserver a la aplicación. Para los mensajes entrantes, la aplicación implementa StreamObserver y lo pasa a la biblioteca GRPC para su recepción.
-Con metodos como el  onCompleted(): Recibe una notificación de finalización exitosa de la transmisión.
-onError(Throwable t) y onNext(V value): Recibe un valor de la secuencia.
+   En el ejemplo podemos ver el valor de retorno de objetos Observers, utilizados tanto por los stubs del cliente como las implementaciones de servicios para enviar o recibir 'stream messages'.
 
-Lo que hace que GRPC utilice una capa de abstaccion en su manejo en lo valores de retorno.
+   Para los mensajes salientes, la biblioteca GRPC proporciona un StreamObserver a la aplicación. Para los mensajes entrantes, la aplicación implementa StreamObserver y lo pasa a la biblioteca GRPC para su recepción.
+
+   Con metodos como el  onCompleted(): Recibe una notificación de finalización exitosa de la transmisión. onError(Throwable t) y onNext(V value): Recibe un valor de la secuencia.
+
+   Lo que hace que GRPC utilice una capa de abstaccion en su manejo en lo valores de retorno.
 
 
 
@@ -82,10 +119,7 @@ Para este punto se implementaron funciones basicas para el manejo de archivos(le
 
 - **UploadFileServer.java**: El proposito de esta clase Java es hacer de servidor, crea un socket de que se queda escuchando indefinidamente en un puerto establecido esperando nuevas peticiones.
 
-- **UploadFileClient.java**: La clase cliente es la encargada de crear y enviar peticiones al servicio de gRPC. Por cada peticion los datos se dividen en buffers de 512kb, con el fin de evitar problemas con archivos de gran tamaño.
-
-En la implementacion del servidor 
-
+- **UploadFileClient.java**: La clase cliente es la encargada de crear y enviar peticiones al servicio de gRPC. Por cada peticion los datos se dividen en buffers de 512kb, con el fin de evitar problemas con archivos de gran tamaño ademas de reducir la cantidad máxima de memoria requerida para procesar cada mensaje.
 
 b.- Investigue si es posible que varias invocaciones remotas esten ejecutandose concurrentemente y si esto es apropiado o no para el servidor de archivos del ejercicio anterior. En caso de que no se apropiado, analice si es posible proveer una solucion (enunciar/describir una solucion, no es necesario implementarla).
 **Nota:** diseñe un experimento con el que se pueda demostrar fehacientemente que dos o mas invocaciones remotas se ejecutan concurrentemente o no.
