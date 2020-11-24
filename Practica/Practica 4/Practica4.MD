@@ -29,10 +29,24 @@ Ejecución:
 - **run-report** (*el cual ejecuta el ReportAgent de la siguiente manera:
 `cd Report && java -cp ../lib/jade.jar:classes jade.Boot -gui -container -host localhost -agents mol:ReportAgent`)*
 
+Algoritmo de instantanea:
+
+*Se utiliza un algoritmo de instantánea para crear una instantánea coherente del estado global de un sistema distribuido.D ebido a la falta de memoria compartida.*
+
+Varias computadoras trabajan juntas en un sistema distribuido. Cada uno de ellos representa una computadora con una determinada cantidad de memoria total, informacion, etc. Los participantes pueden modificar su cantidad de memoria disponible.
+
+Al calcular la cantidad de memoria total disponible. Solo solicitar la memoria de cada participante puede llevar a un resultado incorrecto, si uno de ellos acaba de cambiar su espacio de memoria disponible.
+
+
+Otro ejemplo:
+
+Cada computadora representa una cuenta bancaria con una determinada cantidad de dinero. Los participantes pueden transferir dinero entre sus cuentas intercambiando mensajes.
+Suponga que se calculará el saldo global. Solo solicitar el saldo de cada participante puede llevar a un resultado incorrecto, si uno de ellos acaba de enviar un mensaje de transferencia a otro (y por lo tanto ya ha disminuido su propio saldo), que aún no lo recibió.
+
+  **Un algoritmo de instantáneas evita tales inconsistencias.**
   
   
-  
-2. Programe un agente para que calcule la suma de todos los números almacenados en un archivo de una computadora que se le pasa como parámetro. Comente cómo se haría lo mismo con una aplicación cliente/servidor. Comente que pasaría si hubiera otros sitios con archivos que deben ser procesados de manera similar.
+1. Programe un agente para que calcule la suma de todos los números almacenados en un archivo de una computadora que se le pasa como parámetro. Comente cómo se haría lo mismo con una aplicación cliente/servidor. Comente que pasaría si hubiera otros sitios con archivos que deben ser procesados de manera similar.
 
   
 
