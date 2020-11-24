@@ -11,11 +11,11 @@ build:
 start:
 	java -cp lib/jade.jar:classes jade.Boot -gui
 
-run-info:
-	cd Info && java -cp ../lib/jade.jar:classes jade.Boot -gui -container -host localhost -agents mol:InfoAgent
+run-report:
+	cd Report && java -cp ../lib/jade.jar:classes jade.Boot -gui -container -host localhost -agents mol:ReportAgent
 
-run-sum:
-	cd Sum && java -cp ../lib/jade.jar:classes jade.Boot -gui -container -host localhost -agents mol:SumAgent
+run-suma:
+	cd Suma && java -cp ../lib/jade.jar:classes jade.Boot -gui -container -host localhost -agents mol:SumaAgent
 
 run-ftp:
 	./FTP/run --help
