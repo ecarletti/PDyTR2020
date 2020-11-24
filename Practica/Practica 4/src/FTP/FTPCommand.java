@@ -10,7 +10,7 @@ import java.io.InputStream;
 import java.io.FileInputStream;
 
 public class FTPCommand {
-	public static byte[] read(String path, int position, int currentSize, long fileSize) {
+	public static byte[] read(String path, int currentSize, long fileSize) {
 		try {
 			int chunck = 1024;
 			int noBytes = ((int) fileSize - currentSize) < chunck
@@ -19,7 +19,7 @@ public class FTPCommand {
 			
 			byte[] contents = new byte[noBytes];
 
-			System.out.printf("Reading %d bytes from %d\n", noBytes, currentSize);
+			System.out.printf("Leyendo %d bytes de %d\n", noBytes, currentSize);
 
 			InputStream in = new FileInputStream(path);
 			in.skip(currentSize);
@@ -42,7 +42,7 @@ public class FTPCommand {
 				Files.write(Paths.get(path), data, StandardOpenOption.APPEND);
 			}
 			
-			System.out.printf("Written %d of %d bytes\n", currentSize, fileSize);
+			System.out.printf("Escribiendo %d de %d bytes\n", currentSize, fileSize);
 			return data.length;
 		} catch (IOException e) {
 			System.out.println(e.toString());

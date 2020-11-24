@@ -32,10 +32,10 @@ public class FTPAgent extends Agent {
 
 		try {
 			ContainerID destination = new ContainerID("Main-Container", null);
-			System.out.println("Migrating the agent " + destination.getID());
+			System.out.println("Migrando el agente a " + destination.getID());
 			doMove(destination);
 		} catch (Exception e) {
-			System.out.println("Error: It was not posible to migrate the agent!");
+			System.out.println("No fue posible migrar el agente");
 			System.out.println(e);
 		}
 	}
@@ -59,12 +59,12 @@ public class FTPAgent extends Agent {
 			FTPCommand.write(storeDir, this.file, this.currentSize, this.fileSize);
 			doMove(new ContainerID(this.origen.getName(), null));
 		} else if (this.fileSize > this.currentSize) {
-			this.file = FTPCommand.read(this.sourcePath, this.currentSize, this.currentSize, this.fileSize);
+			this.file = FTPCommand.read(this.sourcePath, this.currentSize, this.fileSize);
 			this.currentSize += this.file.length;
-			System.out.printf("%d of %d bytes readed\n", this.file.length, this.fileSize);
+			System.out.printf("%d de %d bytes leidos\n", this.file.length, this.fileSize);
 			doMove(new ContainerID("Main-Container", null));
 		} else {
-			System.out.println("The file " + this.sourcePath + " was written in the remote directory " + this.destinationPath);
+			System.out.println("El archivo " + this.sourcePath + " fue escrito en el directorio remoto: " + this.destinationPath);
 		}
 	}
 
@@ -72,9 +72,9 @@ public class FTPAgent extends Agent {
 		String currentDirectory = System.getProperty("user.dir");
 		String storeDir = currentDirectory + "/store/" + this.sourcePath;
 		if (!here.getName().equals(this.origen.getName())) {
-			this.file = FTPCommand.read(storeDir, this.currentSize, this.currentSize, this.fileSize);
+			this.file = FTPCommand.read(storeDir, this.currentSize, this.fileSize);
 			this.currentSize += this.file.length;
-			System.out.printf("Reading %d bytes of %d\n", this.file.length, this.fileSize);
+			System.out.printf("Leyendo %d bytes de %d\n", this.file.length, this.fileSize);
 			doMove(new ContainerID(this.origen.getName(), null));
 			return;
 		}
@@ -82,16 +82,16 @@ public class FTPAgent extends Agent {
 		try {
 			try {
 				Files.write(Paths.get(this.destinationPath), this.file,StandardOpenOption.APPEND);
-				System.out.printf("Writing %d bytes of %d\n", this.file.length, this.fileSize);
+				System.out.printf("Escribiendo %d bytes de %d\n", this.file.length, this.fileSize);
 			} catch (IOException e) {
 				Files.createFile(Paths.get(this.destinationPath));
 				Files.write(Paths.get(this.destinationPath), this.file,StandardOpenOption.APPEND);
 			} finally {
 				if (this.fileSize > this.currentSize) {
-					System.out.println("Bytes left!");
+					System.out.println("Quedan bytes!");
 					doMove(new ContainerID("Main-Container", null));
 				} else {
-					System.out.println("The file " + this.destinationPath + " was readed correctly and successfuly loaded in " + this.destinationPath);
+					System.out.println("El archivo " + this.destinationPath + " fue escrito correctamente y cargado satisfactoriamente en " + this.destinationPath);
 				}
 			}
 		} catch (IOException e) {
@@ -105,7 +105,7 @@ public class FTPAgent extends Agent {
 			case "write":
 			case "read":
 				if (args.length != 3) {
-					System.out.println("3 argument needed: command, local directory and remote directory");
+					System.out.println("3 argumentos necesarios, comando(metodo), directorio local y directorio remoto");
 					System.exit(1);
 				}
 				
@@ -114,7 +114,7 @@ public class FTPAgent extends Agent {
 				this.destinationPath = (String) args[2];
 
 				if (this.method.equals("write")) {
-					this.file = FTPCommand.read(this.destinationPath, this.currentSize, this.currentSize, this.fileSize);
+					this.file = FTPCommand.read(this.destinationPath, this.currentSize, this.fileSize);
 					this.currentSize += this.file.length;
 					this.fileSize = Files.size(Paths.get(this.sourcePath));
 				} else {
