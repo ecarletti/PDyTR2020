@@ -29,11 +29,11 @@ Ejecución:
 - **run-report** (*el cual ejecuta el ReportAgent de la siguiente manera:
 `cd Report && java -cp ../lib/jade.jar:classes jade.Boot -gui -container -host localhost -agents mol:ReportAgent`)*
 
-Algoritmo de instantanea:
+Algoritmo de instantánea:
 
-*Se utiliza un algoritmo de instantánea para crear una instantánea coherente del estado global de un sistema distribuido.D ebido a la falta de memoria compartida.*
+*Se utiliza un algoritmo de instantánea para crear una instantánea coherente del estado global de un sistema distribuido. Debido a la falta de memoria compartida.*
 
-Varias computadoras trabajan juntas en un sistema distribuido. Cada uno de ellos representa una computadora con una determinada cantidad de memoria total, informacion, etc. Los participantes pueden modificar su cantidad de memoria disponible.
+Varias computadoras trabajan juntas en un sistema distribuido. Cada uno de ellos representa una computadora con una determinada cantidad de memoria total, información, etc. Los participantes pueden modificar su cantidad de memoria disponible.
 
 Al calcular la cantidad de memoria total disponible. Solo solicitar la memoria de cada participante puede llevar a un resultado incorrecto, si uno de ellos acaba de cambiar su espacio de memoria disponible.
 
@@ -62,7 +62,7 @@ Ejecución
    
   - **make start**
    
-   - **run-suma** (`cd Sum && java -cp ../lib/jade.jar:classes jade.Boot -gui -container -host localhost -agents mol:SumaAgent`)
+   - **run-suma** (`cd Suma && java -cp ../lib/jade.jar:classes jade.Boot -gui -container -host localhost -agents mol:SumaAgent`)
 
   
 
